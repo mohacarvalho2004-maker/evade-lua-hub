@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evade Script — Lua Hub for Roblox Evade | evade-lua-hub</title>
+<meta name="description" content="Evade Script hub for Lua executors: aimbot, ESP, wallhack, speed and jump modifiers, auto-farm, silent aim modules. Free & open source for Windows 10 / 11.">
+<style>
+  :root{
+    --bg-0:#070a16;
+    --bg-1:#0c1024;
+    --bg-2:#141a3a;
+    --indigo:#6d5efc;
+    --violet:#a06bff;
+    --cyan:#35e6d0;
+    --text:#eef0ff;
+    --muted:#9aa3c7;
+    --line:rgba(255,255,255,.09);
+    --glass:rgba(255,255,255,.055);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1100px 620px at 12% -10%, rgba(109,94,252,.28), transparent 60%),
+      radial-gradient(900px 560px at 92% 6%, rgba(53,230,208,.13), transparent 62%),
+      radial-gradient(1000px 700px at 50% 110%, rgba(160,107,255,.16), transparent 65%),
+      linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 45%, var(--bg-2) 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky;top:0;z-index:100;
+    backdrop-filter:blur(18px) saturate(150%);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);
+    background:rgba(9,12,28,.62);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:20px;height:70px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:.2px;text-decoration:none;color:var(--text)}
+  .brand-mark{
+    width:32px;height:32px;border-radius:9px;flex:0 0 auto;
+    display:grid;place-items:center;font-size:.95rem;
+    background:linear-gradient(135deg,var(--indigo),var(--violet));
+    box-shadow:0 6px 20px rgba(109,94,252,.45);
+  }
+  .brand span{background:linear-gradient(90deg,#fff,#b9b2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nav-links{display:flex;align-items:center;gap:30px;list-style:none}
+  .nav-links a{
+    color:var(--muted);text-decoration:none;font-size:.92rem;font-weight:500;
+    transition:color .2s ease;position:relative;
+  }
+  .nav-links a:hover{color:#fff}
+  .nav-links a::after{
+    content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,var(--indigo),var(--cyan));
+    transform:scaleX(0);transform-origin:left;transition:transform .25s ease;
+  }
+  .nav-links a:hover::after{transform:scaleX(1)}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    font-weight:700;font-size:.95rem;text-decoration:none;border-radius:12px;
+    padding:13px 24px;border:1px solid transparent;cursor:pointer;
+    transition:transform .18s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{
+    color:#fff;
+    background:linear-gradient(135deg,var(--indigo) 0%,var(--violet) 55%,#7a5cff 100%);
+    box-shadow:0 10px 28px rgba(109,94,252,.42), inset 0 1px 0 rgba(255,255,255,.22);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(109,94,252,.6), inset 0 1px 0 rgba(255,255,255,.28)}
+  .btn-ghost{
+    color:var(--text);
+    background:rgba(255,255,255,.05);
+    border-color:rgba(255,255,255,.16);
+    backdrop-filter:blur(8px);
+  }
+  .btn-ghost:hover{transform:translateY(-2px);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3)}
+  .btn-sm{padding:10px 18px;font-size:.88rem;border-radius:10px}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:86px 0 72px;text-align:center;position:relative}
+  .pill{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:8px 16px;border-radius:999px;font-size:.8rem;font-weight:600;
+    letter-spacing:.4px;text-transform:uppercase;color:#c9c3ff;
+    background:rgba(109,94,252,.14);
+    border:1px solid rgba(109,94,252,.38);
+    box-shadow:0 0 30px rgba(109,94,252,.18);
+  }
+  .pill .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 10px var(--cyan);
+    animation:pulse 1.9s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
+
+  h1{
+    margin:26px auto 0;max-width:900px;
+    font-size:clamp(2.3rem,6vw,4.15rem);
+    line-height:1.08;font-weight:800;letter-spacing:-1.4px;
+    background:linear-gradient(100deg,#ffffff 0%,#cfc7ff 34%,#8f7dff 62%,#4fe0d0 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    padding-bottom:6px;
+  }
+  .hero p.lead{
+    margin:22px auto 0;max-width:660px;
+    color:var(--muted);font-size:clamp(1rem,1.6vw,1.13rem);
+  }
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:34px}
+  .hero-actions .btn{padding:15px 30px;font-size:1rem}
+
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    margin-top:58px;
+  }
+  .stat{
+    padding:20px 14px;border-radius:14px;
+    background:var(--glass);
+    border:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    transition:border-color .25s ease, transform .25s ease;
+  }
+  .stat:hover{border-color:rgba(109,94,252,.45);transform:translateY(-3px)}
+  .stat b{display:block;font-size:1.32rem;font-weight:800;letter-spacing:-.3px;
+    background:linear-gradient(90deg,#fff,#a99dff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat small{display:block;margin-top:4px;color:var(--muted);font-size:.78rem;letter-spacing:.5px;text-transform:uppercase}
+
+  /* ---------- SECTION HEADINGS ---------- */
+  section{padding:70px 0}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 46px}
+  .sec-tag{
+    font-size:.76rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    color:#8f86ff;
+  }
+  .sec-head h2{
+    margin-top:12px;font-size:clamp(1.65rem,3.4vw,2.4rem);
+    font-weight:800;letter-spacing:-.8px;line-height:1.2;
+  }
+  .sec-head p{margin-top:12px;color:var(--muted);font-size:.98rem}
+
+  /* ---------- FEATURES ---------- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{
+    position:relative;overflow:hidden;
+    padding:28px 24px 26px;border-radius:var(--radius);
+    background:linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.022));
+    border:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    transition:transform .28s cubic-bezier(.2,.7,.3,1), box-shadow .28s ease, border-color .28s ease;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--indigo),var(--violet),var(--cyan));
+    opacity:.85;
+  }
+  .card:hover{
+    transform:translateY(-7px);
+    border-color:rgba(109,94,252,.42);
+    box-shadow:0 22px 46px -18px rgba(109,94,252,.55), 0 0 0 1px rgba(109,94,252,.14);
+  }
+  .card .ico{
+    width:48px;height:48px;border-radius:13px;display:grid;place-items:center;
+    font-size:1.45rem;margin-bottom:16px;
+    background:linear-gradient(145deg, rgba(109,94,252,.24), rgba(53,230,208,.12));
+    border:1px solid rgba(255,255,255,.1);
+  }
+  .card h3{font-size:1.06rem;font-weight:750;letter-spacing:-.2px;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:.9rem}
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps{position:relative;max-width:760px;margin:0 auto;padding-left:66px}
+  .steps::before{
+    content:"";position:absolute;left:23px;top:14px;bottom:14px;width:3px;border-radius:3px;
+    background:linear-gradient(180deg,var(--indigo),var(--violet) 50%,var(--cyan));
+    box-shadow:0 0 18px rgba(109,94,252,.55);
+  }
+  .step{position:relative;padding:0 0 40px 0}
+  .step:last-child{padding-bottom:0}
+  .step .num{
+    position:absolute;left:-66px;top:-2px;
+    width:49px;height:49px;border-radius:50%;
+    display:grid;place-items:center;font-weight:800;font-size:1rem;color:#fff;
+    background:linear-gradient(135deg,var(--indigo),var(--violet));
+    border:3px solid #0c1024;
+    box-shadow:0 0 0 1px rgba(109,94,252,.5), 0 8px 22px rgba(109,94,252,.42);
+  }
+  .step h3{font-size:1.1rem;font-weight:750;margin-bottom:6px;letter-spacing:-.2px}
+  .step p{color:var(--muted);font-size:.93rem}
+
+  /* ---------- FAQ ---------- */
+  .faq{max-width:790px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  details{
+    border-radius:14px;
+    background:var(--glass);
+    border:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    overflow:hidden;
+    transition:border-color .25s ease, background .25s ease;
+  }
+  details[open]{border-color:rgba(109,94,252,.45);background:rgba(109,94,252,.07)}
+  summary{
+    list-style:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:19px 22px;font-weight:650;font-size:.98rem;color:var(--text);
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{
+    content:"+";flex:0 0 auto;
+    width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+    font-size:1.25rem;font-weight:400;line-height:1;color:#b8b0ff;
+    background:rgba(109,94,252,.16);border:1px solid rgba(109,94,252,.3);
+    transition:transform .28s ease, color .28s ease, background .28s ease;
+  }
+  details[open] summary::after{
+    content:"×";transform:rotate(180deg);
+    color:#fff;background:linear-gradient(135deg,var(--indigo),var(--violet));
+    border-color:transparent;
+  }
+  details .answer{padding:0 22px 20px;color:var(--muted);font-size:.91rem}
+
+  /* ---------- CTA BANNER ---------- */
+  .cta-band{padding:20px 0 80px}
+  .cta-card{
+    position:relative;overflow:hidden;text-align:center;
+    padding:64px 30px;border-radius:26px;
+    border:1px solid rgba(109,94,252,.35);
+    background:linear-gradient(160deg, rgba(109,94,252,.18), rgba(20,26,58,.72) 55%, rgba(53,230,208,.1));
+    backdrop-filter:blur(14px);
+    box-shadow:0 30px 70px -30px rgba(109,94,252,.6);
+  }
+  .cta-card::before{
+    content:"";position:absolute;left:50%;top:-40%;width:760px;height:760px;transform:translateX(-50%);
+    background:radial-gradient(circle, rgba(160,107,255,.4), rgba(109,94,252,.16) 42%, transparent 68%);
+    pointer-events:none;
+  }
+  .cta-card > *{position:relative;z-index:1}
+  .cta-card h2{
+    font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;letter-spacing:-1px;line-height:1.15;
+    background:linear-gradient(95deg,#fff,#c7bfff 55%,#5fe8d8);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .cta-card p{margin:16px auto 0;max-width:540px;color:var(--muted);font-size:.98rem}
+  .cta-card .btn{margin-top:30px;padding:16px 36px;font-size:1.02rem}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    background:rgba(6,8,20,.55);
+    padding:34px 0;
+  }
+  .foot-inner{
+    display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    font-size:.87rem;color:var(--muted);
+  }
+  .foot-inner a{color:#b7b0ff;text-decoration:none;font-weight:600;transition:color .2s}
+  .foot-inner a:hover{color:#fff}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 18px}
+    .nav-links{display:none}
+    .nav-inner{height:64px}
+    .hero{padding:60px 0 52px}
+    .hero-actions{flex-direction:column;align-items:stretch}
+    .hero-actions .btn{width:100%}
+    .grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr;margin-top:42px}
+    section{padding:54px 0}
+    .steps{padding-left:56px}
+    .steps::before{left:18px}
+    .step .num{left:-56px;width:41px;height:41px;font-size:.9rem}
+    .cta-card{padding:48px 22px;border-radius:20px}
+    .foot-inner{flex-direction:column;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark">⚡</span>
+      <span>evade-lua-hub</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary btn-sm" href="https://gitscore.cc" target="_blank" rel="noopener">Download</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="pill"><span class="dot"></span> Evade Script · Lua Hub</div>
+
+      <h1>Dominate Every Round in Evade With One Lua Script Hub</h1>
+
+      <p class="lead">
+        evade-lua-hub is a modular Evade Script collection for Lua executors on Windows.
+        Toggle aimbot, ESP, wallhack, speed and jump modifiers, auto-farm and silent aim
+        modules from a single clean menu — free, open source and updated with every patch.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://gitscore.cc" target="_blank" rel="noopener">⬇ Download Evade Script</a>
+        <a class="btn btn-ghost" href="https://gitscore.cc" target="_blank" rel="noopener">★ View on GitHub</a>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b>128K+</b><small>Downloads</small></div>
+        <div class="stat"><b>v4.2.1</b><small>Latest version</small></div>
+        <div class="stat"><b>Windows 10 / 11</b><small>Platform</small></div>
+        <div class="stat"><b>Free &amp; open source</b><small>License</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FEATURES ================= -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">Features</div>
+        <h2>Every Evade Module You Actually Use</h2>
+        <p>Six battle-tested modules built for Evade Script — each one toggleable, configurable and lightweight enough to stay under the radar.</p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="ico">🎯</div>
+          <h3>Aimbot</h3>
+          <p>Smart target selection with FOV, smoothing and hitbox priority so your shots land on the nearest Evade threat every single round.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico">👁️</div>
+          <h3>ESP &amp; Wallhack</h3>
+          <p>See players, roles and objectives through walls with name tags, distance readouts and clean box ESP rendered by the Lua hub.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico">⚡</div>
+          <h3>Speed &amp; Jump Modifiers</h3>
+          <p>Tune walk speed and jump power in real time with safe caps, giving you faster rotations without breaking the game loop.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico">🌾</div>
+          <h3>Auto-Farm</h3>
+          <p>Idle-friendly automation that handles objectives and round loops while you are away — great for grinding Evade cosmetics.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico">🔇</div>
+          <h3>Silent Aim</h3>
+          <p>Server-side style hit registration module with configurable miss chance, perfect for a subtle Evade Script aim assist setup.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico">🛠️</div>
+          <h3>Executor Ready</h3>
+          <p>Ships as a single loadstring-compatible Lua file. Works with the most popular executors on Windows and updates with each patch.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">How it works</div>
+        <h2>Loaded in Under a Minute</h2>
+        <p>No installers, no bundlers, no bloat. Three steps from download to a fully configured Evade Script menu.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <h3>Download the hub</h3>
+          <p>Grab the latest evade-lua-hub package from the download page and extract the single <code>evade.lua</code> file anywhere on your Windows machine.</p>
+        </div>
+
+        <div class="step">
+          <div class="num">2</div>
+          <h3>Load it in your Lua executor</h3>
+          <p>Open your executor, attach it to Evade, then paste the script or load the file directly. The hub imports all modules automatically.</p>
+        </div>
+
+        <div class="step">
+          <div class="num">3</div>
+          <h3>Toggle your modules</h3>
+          <p>Use the in-game hub menu to enable aimbot, ESP, wallhack, speed modifiers, auto-farm or silent aim — settings save per session.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FAQ ================= -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">FAQ</div>
+        <h2>Questions About Evade Script</h2>
+        <p>Everything you need to know before loading evade-lua-hub on your system.</p>
+      </div>
+
+      <div class="faq">
+        <details>
+          <summary>Is evade-lua-hub free to use?</summary>
+          <div class="answer">Yes. The entire Evade Script hub is free and open source. You can download it from gitscore.cc, read the Lua source yourself, fork it on GitHub and modify any module to fit your own executor setup.</div>
+        </details>
+
+        <details>
+          <summary>Which executors work with this Evade Script?</summary>
+          <div class="answer">The hub is written in plain Lua and works with the most common Windows executors that support loadstring and the standard Roblox API. It is tested on Windows 10 and Windows 11. If your executor supports the current Evade patch, the script will load.</div>
+        </details>
+
+        <details>
+          <summary>Does it include aimbot, ESP and auto-farm together?</summary>
+          <div class="answer">Yes — all six modules ship in the same package: aimbot, ESP and wallhack, speed and jump modifiers, auto-farm and silent aim. Each one is individually toggleable from the hub menu, so you can run only
